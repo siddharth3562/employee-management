@@ -3,15 +3,21 @@ import axios from 'axios';
 
 const Display = () => {
     const [details, setDetails] = useState([]);
+    const [seremp,setSerEmp] = useState([])
+    const [filteredemp,setFilteredEmp] = useState([])
     const [editing, setEditing] = useState(false);
     const [currentDetails, setCurrentDetails] = useState({
         id: null, name: '', address: '', position: '', salary: '', experience: '', phone: '', email: ''
     });
 
     useEffect(() => {
-        axios.get('https://aiswarya2325.pythonanywhere.com/employemanagement/employees/')
-            .then(response => setDetails(response.data))
+        axios.get('https://alan2325.pythonanywhere.com/employe/employees/')
+            .then(response => {
+                setDetails(response.data)
+                setFilteredEmp(response.data)
+            })
             .catch(error => console.log(error));
+    
     }, []);
 
     const editDetails = (detail) => {
@@ -21,7 +27,7 @@ const Display = () => {
 
     const updateDetail = (id, updatedDetail) => {
         setEditing(false);
-        axios.put(`https://aiswarya2325.pythonanywhere.com/employemanagement/employees/${id}/`, updatedDetail)
+        axios.put(`https://alan2325.pythonanywhere.com/employe/employees/${id}/`, updatedDetail)
             .then(response => {
                 setDetails(details.map(detail => (detail.id === id ? response.data : detail)));
             })
@@ -29,18 +35,26 @@ const Display = () => {
     };
 
     const deleteDetail = (id) => {
-        axios.delete(`https://aiswarya2325.pythonanywhere.com/employemanagement/employees/${id}/`)
+        axios.delete(`https://alan2325.pythonanywhere.com/employe/employees/${id}/`)
             .then(() => {
                 setDetails(details.filter(detail => detail.id !== id));
             })
             .catch(error => console.log(error));
     };
 
+    useEffect(()=>{
+        const result=details.filter(emp=>
+            emp.name.includes(seremp) || emp.address.includes(seremp) || emp.id.toString().includes(seremp)
+        )
+        setFilteredEmp(result)
+    },[seremp,details])
+
     return (
         <div className="container mt-2">
             <h2>User Details</h2>
+            <input type="text" placeholder="Search" name="" value={seremp} onChange={(e)=>setSerEmp(e.target.value)}/>
             <table className="table table-bordered table-hover">
-                {details.map(detail => (
+                {filteredemp.map(detail => (
                     <tr key={detail.id}>
                         <td>{detail.id}</td>
                         <td>{detail.name}</td>
